@@ -56,7 +56,7 @@ env:
 # Use a different ssh user than root
 #
 ssh:
-  user: fairdataihub
+  user: dev
 
 # Use a persistent storage volume.
 #
