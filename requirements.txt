@@ -1,0 +1,10 @@
+Flask
+flask-restx
+Flask-Cors
+python-dotenv
+waitress
+jsonschema
+requests
+
+ollama
+openai

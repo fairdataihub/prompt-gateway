@@ -1,0 +1,13 @@
+version: "3"
+services:
+  cwl-validator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    environment:
+      FLASK_DEBUG: 0
+      FLASK_APP: ./app.py
+      # API Tokens - JSON format for external environment variable management tools
+      # API_KEYS: '[{"appname":"APP1","key":"your-token-here"},{"appname":"WEBAPP","key":"another-token-here"}]'
