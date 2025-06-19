@@ -16,7 +16,7 @@ import ollama
 
 
 # Constant list of allowed models
-ALLOWED_MODELS = ["deepseek-r1:8b", "llama3:8b"]
+ALLOWED_MODELS = ["llama3:8b"]
 
 
 def check_ollama_health():
