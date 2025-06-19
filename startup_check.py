@@ -6,7 +6,15 @@ This script checks if Ollama is accessible from within a container.
 
 import sys
 import time
+import logging
 import requests
+
+# Configure basic logging for the script
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 
 def check_ollama_health():
@@ -29,31 +37,42 @@ def check_ollama_health():
 
 def wait_for_ollama(max_retries=10, retry_delay=2):
     """Wait for Ollama to become available with retry logic"""
-    print("🔍 Checking Ollama availability for Docker container...")
-    print("Note: Ollama should be running outside the container on the host machine")
+    logging.info("🔍 Checking Ollama availability for Docker container...")
+    logging.info(
+        "Note: Ollama should be running outside the container on the host machine"
+    )
 
     for attempt in range(max_retries):
         is_healthy, message = check_ollama_health()
         if is_healthy:
-            print(f"✅ {message}")
-            print("🚀 Ollama is ready! The application can now start.")
+            logging.info("✅ %s", message)
+            logging.info("🚀 Ollama is ready! The application can now start.")
             return True
 
         if attempt < max_retries - 1:  # Don't sleep on the last attempt
-            print(
-                f"❌ Ollama not available (attempt {attempt + 1}/{max_retries}): {message}"
+            logging.warning(
+                "❌ Ollama not available (attempt %d/%d): %s",
+                attempt + 1,
+                max_retries,
+                message,
             )
-            print(f"⏳ Retrying in {retry_delay} seconds...")
+            logging.info("⏳ Retrying in %d seconds...", retry_delay)
             time.sleep(retry_delay)
         else:
-            print(
-                f"❌ Ollama health check failed after {max_retries} attempts: {message}"
+            logging.error(
+                "❌ Ollama health check failed after %d attempts: %s",
+                max_retries,
+                message,
             )
-            print("\nTroubleshooting tips:")
-            print("1. Ensure Ollama is running on the host machine: ollama serve")
-            print("2. Check if the container can access host.docker.internal:11434")
-            print("3. Verify Docker network configuration allows host access")
-            print(
+            logging.info("\nTroubleshooting tips:")
+            logging.info(
+                "1. Ensure Ollama is running on the host machine: ollama serve"
+            )
+            logging.info(
+                "2. Check if the container can access host.docker.internal:11434"
+            )
+            logging.info("3. Verify Docker network configuration allows host access")
+            logging.info(
                 "4. Try running: curl http://host.docker.internal:11434/api/tags from the host"
             )
             return False

@@ -5,6 +5,7 @@ and model management.
 """
 
 import time
+import logging
 import requests
 import ollama
 
@@ -42,10 +43,13 @@ def ensure_ollama_available(max_retries=10, retry_delay=2):
             return True
 
         if attempt < max_retries - 1:  # Don't sleep on the last attempt
-            print(
-                f"Ollama not available (attempt {attempt + 1}/{max_retries}): {message}"
+            logging.warning(
+                "Ollama not available (attempt %d/%d): %s",
+                attempt + 1,
+                max_retries,
+                message,
             )
-            print(f"Retrying in {retry_delay} seconds...")
+            logging.info("Retrying in %d seconds...", retry_delay)
             time.sleep(retry_delay)
 
     raise RuntimeError(
@@ -67,20 +71,20 @@ def pull_model_if_not_exists(model_name):
             )
 
             if not model_exists:
-                print(f"Pulling model {model_name}...")
+                logging.info("Pulling model %s...", model_name)
                 ollama.pull(model_name)
-                print(f"✅ Successfully pulled model {model_name}")
+                logging.info("✅ Successfully pulled model %s", model_name)
             else:
-                print(f"✅ Model {model_name} already exists")
+                logging.info("✅ Model %s already exists", model_name)
         else:
-            print(f"Warning: Could not check existing models for {model_name}")
+            logging.warning("Could not check existing models for %s", model_name)
     except Exception as e:
-        print(f"Warning: Could not pull model {model_name}: {str(e)}")
+        logging.warning("Could not pull model %s: %s", model_name, str(e))
 
 
 def ensure_models_available():
     """Ensure all allowed models are available in Ollama"""
-    print("Ensuring all required models are available...")
+    logging.info("Ensuring all required models are available...")
     for model in ALLOWED_MODELS:
         pull_model_if_not_exists(model)
-    print("✅ All required models check complete")
+    logging.info("✅ All required models check complete")

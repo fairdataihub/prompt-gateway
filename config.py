@@ -5,6 +5,7 @@ It supports loading configuration from both a local .env file and system environ
 """
 
 import json
+import logging
 from os import environ
 from pathlib import Path
 from dotenv import dotenv_values
@@ -70,7 +71,7 @@ def get_api_keys():
                         api_keys[key_obj["appname"]] = key_obj["key"]
         except (json.JSONDecodeError, TypeError) as e:
             # Log the error
-            print(f"Error: Could not parse API_KEYS JSON: {e}")
+            logging.error("Could not parse API_KEYS JSON: %s", e)
 
     return api_keys
 

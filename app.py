@@ -118,5 +118,5 @@ if __name__ == "__main__":
 
     # Start the production server using Waitress
     # Waitress is a production-quality WSGI server for Python
-    print(f"Starting server on {host}:{port} with log level: {loglevel}")
+    logging.info("Starting server on %s:%s with log level: %s", host, port, loglevel)
     serve(flask_app, port=port, host=host)
