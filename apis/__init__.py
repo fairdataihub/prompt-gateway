@@ -3,6 +3,10 @@
 import re
 from functools import wraps
 import requests
+import os
+
+os.environ["OLLAMA_HOST"] = "http://host.docker.internal:11434"
+
 import ollama
 from flask import request
 from flask_restx import Api, Resource

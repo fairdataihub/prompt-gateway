@@ -7,6 +7,11 @@ and model management.
 import time
 import logging
 import requests
+
+import os
+
+os.environ["OLLAMA_HOST"] = "http://host.docker.internal:11434"
+
 import ollama
 
 
