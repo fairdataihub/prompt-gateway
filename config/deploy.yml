@@ -12,7 +12,7 @@ servers:
     hosts: 
       - <%= ENV["KAMAL_SERVER_IP"] %>
     options:
-      - "--add-host=host.docker.internal:host-gateway"
+      add-host: host.docker.internal:host-gateway
   # job:
   #   hosts:
   #     - 192.168.0.1
