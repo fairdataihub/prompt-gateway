@@ -159,13 +159,6 @@ class Query(Resource):
             default="",
         ),
         api.parser().add_argument(
-            "stream",
-            type=bool,
-            help="Whether to stream the response",
-            required=False,
-            default=False,
-        ),
-        api.parser().add_argument(
             "format",
             type=str,
             help="Response format (json, etc.)",
@@ -218,7 +211,6 @@ class Query(Resource):
         top_k = api.payload.get("top_k", 40)
         num_predict = api.payload.get("num_predict", 2048)
         stop = api.payload.get("stop", "")
-        stream = api.payload.get("stream", False)
         format_param = api.payload.get("format", "")
         num_ctx = api.payload.get("num_ctx", 4096)
         num_gpu = api.payload.get("num_gpu", 1)
@@ -309,7 +301,6 @@ class Query(Resource):
                     {"role": "user", "content": query},
                 ],
                 "options": options,
-                "stream": stream,
             }
 
             # Add optional parameters if they differ from defaults
@@ -318,47 +309,33 @@ class Query(Resource):
 
             response_from_model = ollama.chat(**chat_params)
 
-            # Handle both streaming and non-streaming responses
-            if stream:
-                # For streaming, collect all messages
-                messages = []
-                for chunk in response_from_model:
-                    if hasattr(chunk, "message") and hasattr(chunk.message, "content"):
-                        messages.append(chunk.message.content)
+            # Extract response data
+            try:
+                # Convert to string first to avoid generator issues
+                response_str = str(response_from_model)
+                if hasattr(response_from_model, "message"):
+                    message_obj = getattr(response_from_model, "message", None)
+                    if message_obj and hasattr(message_obj, "content"):
+                        content = getattr(message_obj, "content", response_str)
+                    else:
+                        content = response_str
+                else:
+                    content = response_str
+
                 response_data = {
-                    "message": "".join(messages),
+                    "message": content,
+                    "model": getattr(response_from_model, "model", model),
+                    "created_at": getattr(response_from_model, "created_at", None),
+                    "done": getattr(response_from_model, "done", True),
+                }
+            except (AttributeError, TypeError, ValueError) as e:
+                response_data = {
+                    "message": f"Response received but could not parse: {str(response_from_model)}",
                     "model": model,
                     "created_at": None,
                     "done": True,
+                    "parse_error": str(e),
                 }
-            else:
-                # For non-streaming, extract from single response
-                try:
-                    # Convert to string first to avoid generator issues
-                    response_str = str(response_from_model)
-                    if hasattr(response_from_model, "message"):
-                        message_obj = getattr(response_from_model, "message", None)
-                        if message_obj and hasattr(message_obj, "content"):
-                            content = getattr(message_obj, "content", response_str)
-                        else:
-                            content = response_str
-                    else:
-                        content = response_str
-
-                    response_data = {
-                        "message": content,
-                        "model": getattr(response_from_model, "model", model),
-                        "created_at": getattr(response_from_model, "created_at", None),
-                        "done": getattr(response_from_model, "done", True),
-                    }
-                except (AttributeError, TypeError, ValueError) as e:
-                    response_data = {
-                        "message": f"Response received but could not parse: {str(response_from_model)}",
-                        "model": model,
-                        "created_at": None,
-                        "done": True,
-                        "parse_error": str(e),
-                    }
 
             result = {
                 "message": "Success",
@@ -369,7 +346,6 @@ class Query(Resource):
                     "top_p": top_p,
                     "top_k": top_k,
                     "num_predict": num_predict,
-                    "stream": stream,
                     "context_length": num_ctx,
                 },
             }
