@@ -380,7 +380,7 @@ class Query(Resource):
         ) as e:
             result = {
                 "message": "Ollama service is not available",
-                "error": "Cannot connect to Ollama. Please ensure it is running on localhost:11434",
+                "error": "Cannot connect to Ollama. Please ensure it is running on host.docker.internal:11434",
                 "details": str(e),
             }
             status_code = 503

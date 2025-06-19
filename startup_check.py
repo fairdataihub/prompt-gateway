@@ -12,12 +12,15 @@ import requests
 def check_ollama_health():
     """Check if Ollama is running and accessible"""
     try:
-        response = requests.get("http://localhost:11434/api/tags", timeout=5)
+        response = requests.get("http://host.docker.internal:11434/api/tags", timeout=5)
         if response.status_code == 200:
             return True, "Ollama is running and accessible"
         return False, f"Ollama responded with status code: {response.status_code}"
     except requests.exceptions.ConnectionError:
-        return False, "Cannot connect to Ollama. Is it running on localhost:11434?"
+        return (
+            False,
+            "Cannot connect to Ollama. Is it running on host.docker.internal:11434?",
+        )
     except requests.exceptions.Timeout:
         return False, "Connection to Ollama timed out"
     except requests.exceptions.RequestException as e:
@@ -48,9 +51,11 @@ def wait_for_ollama(max_retries=10, retry_delay=2):
             )
             print("\nTroubleshooting tips:")
             print("1. Ensure Ollama is running on the host machine: ollama serve")
-            print("2. Check if the container can access localhost:11434")
+            print("2. Check if the container can access host.docker.internal:11434")
             print("3. Verify Docker network configuration allows host access")
-            print("4. Try running: curl http://localhost:11434/api/tags from the host")
+            print(
+                "4. Try running: curl http://host.docker.internal:11434/api/tags from the host"
+            )
             return False
 
 

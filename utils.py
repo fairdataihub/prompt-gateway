@@ -17,14 +17,17 @@ def check_ollama_health():
     """Check if Ollama is running and accessible"""
     try:
         # Try to connect to Ollama's default endpoint
-        response = requests.get("http://localhost:11434/api/tags", timeout=5)
+        response = requests.get("http://host.docker.internal:11434/api/tags", timeout=5)
 
         if response.status_code == 200:
             return True, "Ollama is running and accessible"
         else:
             return False, f"Ollama responded with status code: {response.status_code}"
     except requests.exceptions.ConnectionError:
-        return False, "Cannot connect to Ollama. Is it running on localhost:11434?"
+        return (
+            False,
+            "Cannot connect to Ollama. Is it running on host.docker.internal:11434?",
+        )
     except requests.exceptions.Timeout:
         return False, "Connection to Ollama timed out"
     except requests.exceptions.RequestException as e:
@@ -54,7 +57,9 @@ def pull_model_if_not_exists(model_name):
     """Pull a model into Ollama if it doesn't already exist"""
     try:
         # Check if model exists by trying to list it
-        response = requests.get("http://localhost:11434/api/tags", timeout=10)
+        response = requests.get(
+            "http://host.docker.internal:11434/api/tags", timeout=10
+        )
         if response.status_code == 200:
             existing_models = response.json().get("models", [])
             model_exists = any(

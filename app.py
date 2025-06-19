@@ -59,7 +59,7 @@ def create_app(config_module=None, log_level="INFO"):
     except RuntimeError as e:
         logging.error("❌ Ollama health check failed after all retries: %s", e)
         logging.error(
-            "Please ensure Ollama is running and accessible on localhost:11434"
+            "Please ensure Ollama is running and accessible on host.docker.internal:11434"
         )
         raise
 

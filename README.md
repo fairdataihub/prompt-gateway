@@ -76,7 +76,7 @@ This application uses token-based authentication to secure access to the LLM end
    Include the token in the `Authorization` header using Bearer format:
 
    ```bash
-   curl -X POST "http://localhost:5000/query" \
+   curl -X POST "http://host.docker.internal:5000/query" \
      -H "Content-Type: application/json" \
      -H "Authorization: Bearer your-token-here" \
      -d '{"query": "Hello, how are you?"}'
@@ -141,7 +141,7 @@ python3 app.py --host $HOST --port $PORT
 When running in a Docker container, ensure that:
 
 1. **Ollama is running on the host machine** (not in the container)
-2. **The container can access localhost:11434** (Ollama's default port)
+2. **The container can access host.docker.internal:11434** (Ollama's default port)
 3. **Docker network configuration allows host access**
 4. **API tokens are properly configured** as environment variables
 
@@ -169,7 +169,7 @@ If you encounter issues with Ollama connectivity:
 1. **Check if Ollama is running on the host**:
 
    ```bash
-   curl http://localhost:11434/api/tags
+   curl http://host.docker.internal:11434/api/tags
    ```
 
 2. **Verify container can access host**:
@@ -186,7 +186,7 @@ If you encounter issues with Ollama connectivity:
    ollama list
    ```
 
-5. **Docker network issues**: If the container cannot access localhost:11434, try:
+5. **Docker network issues**: If the container cannot access host.docker.internal:11434, try:
    - Using `--network host` flag
    - Or mapping the port: `-p 11434:11434`
 
