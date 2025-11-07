@@ -154,6 +154,26 @@ docker run -p 5000:5000 \
   --network host your-app-image
 ```
 
+Depending on your OS, you may need to allow Ollama to run on the loopback address in the environment. One place to configure this is `/etc/systemd/system/ollama.service`. A sample config is shows below:
+
+```toml
+[Unit]
+Description=Ollama Service
+After=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/ollama serve
+User=ollama
+Group=ollama
+Restart=always
+RestartSec=3
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+Environment="OLLAMA_HOST=0.0.0.0"
+
+[Install]
+WantedBy=default.target
+```
+
 ## Health Checks
 
 The application provides several health check endpoints:
